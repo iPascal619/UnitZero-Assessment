@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import { useAuth } from '../AuthContext';
+import { ClipboardList, Check, X } from 'lucide-react';
 
 export default function ClientDashboard() {
   const { user } = useAuth();
@@ -104,7 +105,7 @@ export default function ClientDashboard() {
       <div className="card">
         {requests.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-icon">📋</div>
+            <div className="empty-icon"><ClipboardList size={48} /></div>
             <p>No requests yet. Create your first dataset request!</p>
           </div>
         ) : (
@@ -145,13 +146,13 @@ export default function ClientDashboard() {
                             onClick={() => handleTransition(req.id, 'accepted')}
                             style={{ marginRight: '0.5rem' }}
                           >
-                            ✓ Accept
+                            <Check size={14} /> Accept
                           </button>
                           <button
                             className="btn btn-danger btn-sm"
                             onClick={() => handleTransition(req.id, 'rejected')}
                           >
-                            ✕ Reject
+                            <X size={14} /> Reject
                           </button>
                         </>
                       )}

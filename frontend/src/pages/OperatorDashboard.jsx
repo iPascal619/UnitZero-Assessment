@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import { ClipboardList } from 'lucide-react';
 
 export default function OperatorDashboard() {
   const navigate = useNavigate();
@@ -161,7 +162,7 @@ export default function OperatorDashboard() {
       <div className="card">
         {requests.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-icon">📋</div>
+            <div className="empty-icon"><ClipboardList size={48} /></div>
             <p>No requests match your filter.</p>
           </div>
         ) : (

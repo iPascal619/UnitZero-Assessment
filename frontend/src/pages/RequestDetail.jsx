@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api';
 import { useAuth } from '../AuthContext';
+import { ArrowLeft, Check, X, Plus, ArrowRight } from 'lucide-react';
 
 export default function RequestDetail() {
   const { id } = useParams();
@@ -114,7 +115,7 @@ export default function RequestDetail() {
   return (
     <div>
       <button className="btn btn-outline" onClick={() => navigate(-1)} style={{ marginBottom: '1rem' }}>
-        ← Back
+        <ArrowLeft size={16} /> Back
       </button>
 
       {error && <div className="alert alert-error">{error}</div>}
@@ -164,32 +165,32 @@ export default function RequestDetail() {
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           {isOperator && request.status === 'submitted' && (
             <button className="btn btn-primary" onClick={() => handleTransition('in_progress')}>
-              → Start Working
+              <ArrowRight size={16} /> Start Working
             </button>
           )}
           {isOperator && request.status === 'in_progress' && (
             <button className="btn btn-primary" onClick={() => handleTransition('delivered')}>
-              → Mark Delivered
+              <ArrowRight size={16} /> Mark Delivered
             </button>
           )}
           {isOperator && request.status === 'rejected' && (
             <button className="btn btn-primary" onClick={() => handleTransition('in_progress')}>
-              → Start Rework
+              <ArrowRight size={16} /> Start Rework
             </button>
           )}
           {user?.role === 'client' && request.status === 'delivered' && (
             <>
               <button className="btn btn-success" onClick={() => handleTransition('accepted')}>
-                ✓ Accept
+                <Check size={14} /> Accept
               </button>
               <button className="btn btn-danger" onClick={() => handleTransition('rejected')}>
-                ✕ Reject
+                <X size={14} /> Reject
               </button>
             </>
           )}
           {isOperator && ['submitted', 'in_progress', 'rejected'].includes(request.status) && (
             <button className="btn btn-outline" onClick={openAssignModal}>
-              + Assign Episodes
+              <Plus size={16} /> Assign Episodes
             </button>
           )}
         </div>

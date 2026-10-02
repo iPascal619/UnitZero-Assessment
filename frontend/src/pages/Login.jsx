@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
+import { BarChart2 } from 'lucide-react';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -31,7 +32,9 @@ export default function Login() {
   return (
     <div className="login-page">
       <div className="card login-card">
-        <div className="login-logo">📊</div>
+        <div className="login-logo">
+          <BarChart2 size={24} color="white" />
+        </div>
         <h1>Request Desk</h1>
         <p className="login-subtitle">Sign in to your account</p>
 

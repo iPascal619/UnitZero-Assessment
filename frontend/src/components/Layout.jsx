@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
+import { BarChart2, ClipboardList, BarChart, Film, Users, LogOut } from 'lucide-react';
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
@@ -17,7 +18,7 @@ export default function Layout({ children }) {
       <aside className="sidebar">
         <div className="sidebar-logo">
           <h1>
-            <span className="logo-icon">📊</span>
+            <BarChart2 className="logo-icon" size={28} />
             Request Desk
           </h1>
         </div>
@@ -25,29 +26,29 @@ export default function Layout({ children }) {
         <nav className="sidebar-nav">
           {user?.role === 'client' && (
             <NavLink to="/requests" className={({ isActive }) => isActive ? 'active' : ''}>
-              📋 My Requests
+              <ClipboardList size={18} /> My Requests
             </NavLink>
           )}
 
           {isOperatorOrAdmin && (
             <>
               <NavLink to="/dashboard" className={({ isActive }) => isActive ? 'active' : ''}>
-                📊 All Requests
+                <BarChart size={18} /> All Requests
               </NavLink>
               <NavLink to="/episodes" className={({ isActive }) => isActive ? 'active' : ''}>
-                🎬 Episodes
+                <Film size={18} /> Episodes
               </NavLink>
             </>
           )}
 
           {user?.role === 'admin' && (
             <NavLink to="/users" className={({ isActive }) => isActive ? 'active' : ''}>
-              👤 Users
+              <Users size={18} /> Users
             </NavLink>
           )}
 
           <button onClick={handleLogout} style={{ marginTop: 'auto' }}>
-            🚪 Logout
+            <LogOut size={18} /> Logout
           </button>
         </nav>
 

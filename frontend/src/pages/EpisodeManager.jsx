@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../api';
+import { Film, Upload } from 'lucide-react';
 
 export default function EpisodeManager() {
   const [episodes, setEpisodes] = useState([]);
@@ -67,7 +68,7 @@ export default function EpisodeManager() {
         </div>
         <div>
           <label className="btn btn-primary" style={{ cursor: 'pointer' }}>
-            📤 Import CSV
+            <Upload size={16} /> Import CSV
             <input
               type="file"
               accept=".csv"
@@ -146,7 +147,7 @@ export default function EpisodeManager() {
       <div className="card">
         {episodes.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-icon">🎬</div>
+            <div className="empty-icon"><Film size={48} /></div>
             <p>No episodes found. Import a CSV file to get started.</p>
           </div>
         ) : (
