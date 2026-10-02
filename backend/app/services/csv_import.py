@@ -35,13 +35,30 @@ def _normalize_quality(raw: str | None) -> str | None:
 
 
 def _parse_datetime(raw: str | None) -> datetime | None:
+    """Parse datetime from various formats found in messy CSV exports."""
     v = _normalize(raw)
     if v is None:
         return None
-    try:
-        return datetime.strptime(v, "%Y-%m-%d %H:%M:%S")
-    except ValueError:
-        return None
+
+    # Strip trailing timezone indicator (we store as naive UTC)
+    v = v.rstrip("Z").rstrip("+00:00")
+
+    # Try common formats in order of likelihood
+    formats = [
+        "%Y-%m-%dT%H:%M:%S",    # ISO 8601 with T separator
+        "%Y-%m-%d %H:%M:%S",    # Space-separated
+        "%Y-%m-%dT%H:%M",       # ISO 8601 without seconds
+        "%Y-%m-%d %H:%M",       # Space-separated without seconds
+        "%d/%m/%Y %H:%M",       # European format
+        "%m/%d/%Y %H:%M:%S",    # US format
+        "%Y-%m-%d",             # Date only
+    ]
+    for fmt in formats:
+        try:
+            return datetime.strptime(v, fmt)
+        except ValueError:
+            continue
+    return None
 
 
 def _parse_float(raw: str | None) -> float | None:

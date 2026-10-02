@@ -31,9 +31,6 @@ export default function OperatorDashboard() {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    const evtSource = new EventSource(`/api/events?token=${token}`);
-    // EventSource doesn't support headers, so we use a custom approach
-    // We'll use fetch-based SSE instead
     let cancelled = false;
 
     async function connectSSE() {
@@ -64,12 +61,9 @@ export default function OperatorDashboard() {
     }
 
     connectSSE();
-    // Close the native EventSource since we're using fetch
-    evtSource.close();
 
     return () => {
       cancelled = true;
-      evtSource.close();
     };
   }, []);
 

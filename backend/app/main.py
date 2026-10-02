@@ -2,6 +2,7 @@
 
 import json
 import logging
+import os
 import time
 from contextlib import asynccontextmanager
 
@@ -42,8 +43,6 @@ def _seed_users(db):
             db.add(user)
     db.commit()
 
-
-import os
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

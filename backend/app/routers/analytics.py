@@ -75,33 +75,67 @@ def get_analytics(
     ]
 
     # 3. Median time from submitted to delivered
-    # We join status_history to find the submitted and delivered timestamps
-    # Using percentile_cont for PostgreSQL; for SQLite we'd need a different approach
+    # PostgreSQL supports percentile_cont; SQLite does not.
     from sqlalchemy.sql import text
 
-    median_result = db.execute(
-        text("""
-            SELECT percentile_cont(0.5) WITHIN GROUP (
-                ORDER BY EXTRACT(EPOCH FROM (delivered.changed_at - submitted.changed_at)) / 3600.0
-            ) AS median_hours
-            FROM (
-                SELECT request_id, MIN(changed_at) AS changed_at
-                FROM status_history
-                WHERE to_status = 'submitted'
-                GROUP BY request_id
-            ) submitted
-            JOIN (
-                SELECT request_id, MIN(changed_at) AS changed_at
-                FROM status_history
-                WHERE to_status = 'delivered'
-                GROUP BY request_id
-            ) delivered ON submitted.request_id = delivered.request_id
-        """)
-    ).fetchone()
-
     median_hours = None
-    if median_result and median_result[0] is not None:
-        median_hours = round(float(median_result[0]), 2)
+    dialect = db.bind.dialect.name if db.bind else "sqlite"
+
+    try:
+        if dialect == "postgresql":
+            median_result = db.execute(
+                text("""
+                    SELECT percentile_cont(0.5) WITHIN GROUP (
+                        ORDER BY EXTRACT(EPOCH FROM (delivered.changed_at - submitted.changed_at)) / 3600.0
+                    ) AS median_hours
+                    FROM (
+                        SELECT request_id, MIN(changed_at) AS changed_at
+                        FROM status_history
+                        WHERE to_status = 'submitted'
+                        GROUP BY request_id
+                    ) submitted
+                    JOIN (
+                        SELECT request_id, MIN(changed_at) AS changed_at
+                        FROM status_history
+                        WHERE to_status = 'delivered'
+                        GROUP BY request_id
+                    ) delivered ON submitted.request_id = delivered.request_id
+                """)
+            ).fetchone()
+            if median_result and median_result[0] is not None:
+                median_hours = round(float(median_result[0]), 2)
+        else:
+            # SQLite fallback: compute fulfilment hours per request, sort, pick median
+            rows = db.execute(
+                text("""
+                    SELECT
+                        (julianday(delivered.changed_at) - julianday(submitted.changed_at)) * 24.0
+                        AS hours
+                    FROM (
+                        SELECT request_id, MIN(changed_at) AS changed_at
+                        FROM status_history
+                        WHERE to_status = 'submitted'
+                        GROUP BY request_id
+                    ) submitted
+                    JOIN (
+                        SELECT request_id, MIN(changed_at) AS changed_at
+                        FROM status_history
+                        WHERE to_status = 'delivered'
+                        GROUP BY request_id
+                    ) delivered ON submitted.request_id = delivered.request_id
+                    ORDER BY hours
+                """)
+            ).fetchall()
+            if rows:
+                n = len(rows)
+                mid = n // 2
+                if n % 2 == 1:
+                    median_hours = round(float(rows[mid][0]), 2)
+                else:
+                    median_hours = round((float(rows[mid - 1][0]) + float(rows[mid][0])) / 2, 2)
+    except Exception:
+        # If the median query fails for any reason, return None rather than crashing
+        median_hours = None
 
     # 4. Top 5 task names by number of good episodes
     top_tasks_query = (

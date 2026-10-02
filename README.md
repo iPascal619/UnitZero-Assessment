@@ -43,7 +43,7 @@ pip install -r requirements.txt
 pytest tests/ -v
 ```
 
-Tests use an in-memory SQLite database — no external services needed.
+Tests use a file-based SQLite database (`test.db`, auto-cleaned between tests) — no external services needed. SQLite is used for speed and isolation; production runs on PostgreSQL.
 
 ### What the tests cover
 - **Authorization rules**: login, role-based access, client data isolation

@@ -106,6 +106,7 @@ Later in the process, while verifying the full test suite with the company's upd
 - **Tokens**: JWT with HS256, configurable expiry (default 8 hours). Secret key loaded from environment variable. In production, this would be rotated and stored in a secrets manager.
 - **Input validation**: All inputs validated by Pydantic schemas with type checking, length limits, and regex patterns (e.g., role must match `^(client|operator|admin)$`). SQL injection prevented by SQLAlchemy's parameterized queries.
 - **Authorization**: Enforced server-side via FastAPI dependencies (`require_role()`), not just UI hiding. Every endpoint checks the JWT and the user's role before executing.
+- **CORS**: Currently set to `allow_origins=["*"]` for development convenience. In production, this would be locked down to the specific frontend domain(s) to prevent cross-origin request abuse.
 
 ### Two Vulnerabilities I'd Worry About Most
 
